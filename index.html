@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Premium Glass Auth</title>
+    <title>Premium Glass Auth System</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
 
-    <!-- Dinamik Fon va Roblox Skinlari -->
     <div class="bg-scene">
         <div class="glow-orb orb-1"></div>
         <div class="glow-orb orb-2"></div>
@@ -19,26 +17,23 @@
         <img src="https://www.pngmart.com/files/22/Roblox-Avatar-PNG-Isolated-Photo.png" class="roblox-skin skin-right" alt="skin">
     </div>
 
-    <!-- Ovozlar -->
     <audio id="whoosh-sfx" src="https://www.soundjay.com/misc/sounds/whoosh-01.mp3" preload="auto"></audio>
     <audio id="hover-sfx" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
     <audio id="click-sfx" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto"></audio>
 
-    <!-- 1. INTRO SCREEN (REKLAMA) -->
+    <!-- INTRO -->
     <div id="intro-screen">
         <div class="intro-content">
             <h1 class="hello-txt">HELLO EVERYONE</h1>
             <p class="intro-sub">Sizni ko'rib turganimizdan xursandmiz</p>
             <div class="power-container">
-                <div class="power-btn" id="activate-btn">
-                    <i class="fa-solid fa-power-off"></i>
-                </div>
+                <div class="power-btn" id="activate-btn"><i class="fa-solid fa-power-off"></i></div>
                 <p class="power-label">TIZIMNI FAOLLASHTIRISH</p>
             </div>
         </div>
     </div>
 
-    <!-- 2. TASDIQLASH MODALI -->
+    <!-- VERIFY MODAL -->
     <div id="verify-modal" class="modal-overlay">
         <div class="modal-glass">
             <h3>TASDIQLASH</h3>
@@ -49,12 +44,19 @@
         </div>
     </div>
 
-    <!-- 3. ASOSIY KONTEYNER (SHISHA OYNA) -->
+    <!-- MAIN CONTAINER -->
     <div class="container" id="main-container">
         <div class="shimmer-light"></div>
-        <div class="forms-wrapper">
-            
-            <!-- KIRISH QISMI -->
+        
+        <!-- Login qilingan holat uchun xabar (yashirin) -->
+        <div id="logged-in-view" style="display: none; padding: 40px; text-align: center;">
+            <h2 id="welcome-user">Xush kelibsiz!</h2>
+            <p style="margin: 20px 0;">Siz tizimga muvaffaqiyatli kirgansiz.</p>
+            <button id="logout-btn" class="glass-btn" style="background: #ff4757; color: white;">Chiqish</button>
+        </div>
+
+        <div class="forms-wrapper" id="auth-forms">
+            <!-- LOGIN -->
             <div class="form-box login">
                 <form id="login-form">
                     <h2 class="form-title">Kirish</h2>
@@ -70,22 +72,17 @@
                     <button type="submit" class="glass-btn primary-btn">KIRISH</button>
                     <p class="switch-txt">Hisobingiz yo'qmi? <a href="#" id="to-reg-link">Ro'yxatdan o'tish</a></p>
                     
-                    <!-- TELEGRAM BO'LIMI -->
                     <div class="tg-area">
                         <div class="divider"></div>
                         <div class="tg-buttons">
-                            <a href="https://t.me/random_uzbek" target="_blank" class="tg-link-btn channel">
-                                <i class="fa-brands fa-telegram"></i> TELEGRAM
-                            </a>
-                            <a href="https://t.me/uzbxackerbot_bot" target="_blank" class="tg-link-btn bot">
-                                <i class="fa-solid fa-robot"></i> BOTGA O'TISH
-                            </a>
+                            <a href="https://t.me/random_uzbek" target="_blank" class="tg-link-btn channel"><i class="fa-brands fa-telegram"></i> TELEGRAM</a>
+                            <a href="https://t.me/uzbxackerbot_bot" target="_blank" class="tg-link-btn bot"><i class="fa-solid fa-robot"></i> BOTGA O'TISH</a>
                         </div>
                     </div>
                 </form>
             </div>
 
-            <!-- REGISTRATSIYA QISMI -->
+            <!-- REGISTER -->
             <div class="form-box register">
                 <form id="reg-form">
                     <h2 class="form-title">Registratsiya</h2>
@@ -106,7 +103,6 @@
                     <p class="switch-txt">Hisobingiz bormi? <a href="#" id="to-login-link">Kirish</a></p>
                 </form>
             </div>
-
         </div>
     </div>
 
