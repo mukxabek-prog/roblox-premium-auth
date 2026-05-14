@@ -1,33 +1,44 @@
-// EmailJS Initialization
 (function() {
-    emailjs.init("Qj4dDgU6UZu9c6Vvx"); // Public Key
+    emailjs.init("Qj4dDgU6UZu9c6Vvx");
 })();
 
 const activateBtn = document.getElementById('activate-btn');
 const introScreen = document.getElementById('intro-screen');
 const mainContainer = document.getElementById('main-container');
-const formsWrapper = document.querySelector('.forms-wrapper');
+const formsWrapper = document.getElementById('auth-forms');
+const loggedInView = document.getElementById('logged-in-view');
 
-const whooshSound = document.getElementById('whoosh-sfx');
-const hoverSound = document.getElementById('hover-sfx');
 const clickSound = document.getElementById('click-sfx');
 
 let tempUserData = null;
 let currentSentCode = "";
 
-// Intro Animation & Sound
+// 1. TIZIMNI TEKSHIRISH (Foydalanuvchi oldin kirganmi?)
 window.onload = () => {
-    setTimeout(() => { 
-        if(whooshSound) {
-            whooshSound.volume = 0.5; 
-            whooshSound.play().catch(()=>{}); 
-        }
-    }, 500);
+    const sessionUser = localStorage.getItem('sessionUser');
+    if (sessionUser) {
+        // Agar session bo'lsa, intro va formani yashirib, salomlashish oynasini ko'rsatamiz
+        introScreen.style.display = "none";
+        mainContainer.style.display = "block";
+        showLoggedIn(sessionUser);
+    }
 };
 
-// Activate System
+function showLoggedIn(username) {
+    document.getElementById('auth-forms').style.display = "none";
+    loggedInView.style.display = "block";
+    document.getElementById('welcome-user').innerText = `Xush kelibsiz, ${username}!`;
+}
+
+// Chiqish tugmasi
+document.getElementById('logout-btn').onclick = () => {
+    localStorage.removeItem('sessionUser');
+    location.reload(); // Sahifani yangilash
+};
+
+// Activate Intro
 activateBtn.onclick = () => {
-    if(clickSound) clickSound.play();
+    clickSound.play();
     introScreen.style.opacity = "0";
     setTimeout(() => { 
         introScreen.style.display = "none"; 
@@ -37,37 +48,36 @@ activateBtn.onclick = () => {
 
 // Switch Forms
 document.getElementById('to-reg-link').onclick = (e) => {
-    e.preventDefault(); 
-    if(clickSound) clickSound.play(); 
-    formsWrapper.style.transform = "translateX(-50%)";
+    e.preventDefault(); clickSound.play(); formsWrapper.style.transform = "translateX(-50%)";
 };
-
 document.getElementById('to-login-link').onclick = (e) => {
-    e.preventDefault(); 
-    if(clickSound) clickSound.play(); 
-    formsWrapper.style.transform = "translateX(0)";
+    e.preventDefault(); clickSound.play(); formsWrapper.style.transform = "translateX(0)";
 };
 
 // --- REGISTRATSIYA ---
 const regForm = document.getElementById('reg-form');
 regForm.onsubmit = (e) => {
     e.preventDefault();
-    const username = document.getElementById('reg-username').value;
-    const email = document.getElementById('reg-email').value;
+    const username = document.getElementById('reg-username').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
     const password = document.getElementById('reg-password').value;
     const errorMsg = document.getElementById('reg-error-msg');
 
     let users = JSON.parse(localStorage.getItem('users')) || [];
-    if (users.some(u => u.username === username)) {
+
+    // FOYDALANUVCHI NOMINI TEKSHIRISH (Takrorlanmaslik kerak)
+    if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
         errorMsg.innerText = "Bu foydalanuvchi nomi band!";
         return;
     }
+
+    // EMAILNI TEKSHIRMAYMIZ (Bitta emailga ko'p akkaunt mumkin)
+
     if (password.length !== 8) {
-        errorMsg.innerText = "Parol kam yoki ko'p, 8 ta kiriting";
+        errorMsg.innerText = "Parol roppa-rosa 8 ta bo'lishi kerak";
         return;
     }
 
-    // 5 xonali kod yaratish
     currentSentCode = Math.floor(10000 + Math.random() * 90000).toString();
 
     const templateParams = {
@@ -81,29 +91,25 @@ regForm.onsubmit = (e) => {
             tempUserData = { username, email, password };
             document.getElementById('verify-modal').style.display = "flex";
             errorMsg.innerText = "";
-            alert("Emailingizni tekshiring, kod yuborildi!");
         }, (err) => {
             errorMsg.innerText = "Email yuborishda xato!";
-            console.error("EmailJS Error:", err);
         });
 };
 
-// --- TASDIQLASH ---
+// --- KODNI TASDIQLASH ---
 document.getElementById('verify-confirm-btn').onclick = () => {
     const codeInput = document.getElementById('verify-code-input').value;
-    const verifyError = document.getElementById('verify-error');
-
     if (codeInput === currentSentCode) {
         let users = JSON.parse(localStorage.getItem('users')) || [];
         users.push(tempUserData);
         localStorage.setItem('users', JSON.stringify(users));
 
-        alert("Muvaffaqiyatli ro'yxatdan o'tdingiz!");
+        alert("Ro'yxatdan o'tdingiz! Endi kiring.");
         document.getElementById('verify-modal').style.display = "none";
         formsWrapper.style.transform = "translateX(0)"; 
         regForm.reset();
     } else {
-        verifyError.innerText = "Kod xato!";
+        document.getElementById('verify-error').innerText = "Kod xato!";
     }
 };
 
@@ -111,20 +117,27 @@ document.getElementById('verify-confirm-btn').onclick = () => {
 const loginForm = document.getElementById('login-form');
 loginForm.onsubmit = (e) => {
     e.preventDefault();
-    const user = document.getElementById('login-username').value;
-    const pass = document.getElementById('login-password').value;
+    const userInput = document.getElementById('login-username').value.trim();
+    const passInput = document.getElementById('login-password').value;
     const errorMsg = document.getElementById('login-error-msg');
 
     let users = JSON.parse(localStorage.getItem('users')) || [];
-    const foundUser = users.find(u => u.username === user);
+    const foundUser = users.find(u => u.username.toLowerCase() === userInput.toLowerCase());
 
     if (!foundUser) {
-        errorMsg.innerText = "Foydalanuvchi topilmadi!";
-    } else if (foundUser.password !== pass) {
-        errorMsg.innerText = "Noto'g'ri parol!";
+        errorMsg.innerText = "Foydalanuvchi nomi topilmadi!";
+    } else if (foundUser.password !== passInput) {
+        errorMsg.innerText = "Parol noto'g'ri!";
     } else {
+        // MUVAFFAQIYATLI KIRISH
         errorMsg.style.color = "#00ff00";
-        errorMsg.innerText = "Muvaffaqiyatli kirildi!";
-        setTimeout(() => alert("Xush kelibsiz!"), 500);
+        errorMsg.innerText = "Kirilmoqda...";
+        
+        // SESSION SAQLASH (Eslab qolish)
+        localStorage.setItem('sessionUser', foundUser.username);
+        
+        setTimeout(() => {
+            showLoggedIn(foundUser.username);
+        }, 1000);
     }
 };
